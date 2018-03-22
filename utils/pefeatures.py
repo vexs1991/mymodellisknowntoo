@@ -10,16 +10,33 @@ check out the following resources:
 
 It may be useful to do feature selection to reduce this set of features to a meaningful set
 for your modeling problem.
-'''
-import lief  # pip install https://github.com/lief-project/LIEF/releases/download/0.7.0/linux_lief-0.7.0_py3.6.tar.gz
-# see https://github.com/lief-project/LIEF/releases
 
+
+numpy.ndarray, size 2350, numpy.float64
+
+Section 1.: raw_features ByteHistogram()
+1 + 256 = 257
+Section 2.: raw_features ByteEntropyHistogram()
+256
+Section 3.: raw_features StringExtractor()
+1 + 1 + 1 + 96 + 1 + 1 + 1 + 1 = 103
+
+Section 4.: parsed_features GeneralFileInfo()
+9
+Section 5.: parsed_features HeaderFileInfo()
+62
+Section 6.: parsed_features SectionInfo()
+5 + 50 + 50 + 50 + 50 + 50 = 255
+Section 7.: parsed_features ImportsInfo()
+256 + 1024 = 1280
+Section 8.: parsed_features ExportsInfo()
+128
+'''
+import lief
 import numpy as np
 # FeatureHasher(n_features=10).transform( [ {k:v}, {k:v}])
 from sklearn.feature_extraction import FeatureHasher
-
 import re
-
 
 class FeatureType(object):
     '''Base class from which each feature type may inherit'''

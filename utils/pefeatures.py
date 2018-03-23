@@ -16,21 +16,82 @@ numpy.ndarray, size 2350, numpy.float64
 
 Section 1.: raw_features ByteHistogram()
 1 + 256 = 257
+1.1 (1) total size of bytestream
+1.2 (256) histogram
+
 Section 2.: raw_features ByteEntropyHistogram()
 256
+
 Section 3.: raw_features StringExtractor()
 1 + 1 + 1 + 96 + 1 + 1 + 1 + 1 = 103
+3.1 (1) sum of strings in bin (string = printable chars with len >= 5)
+3.2 (1) avg len strings
+3.3 (1) distribution of characters in printable strings
+3.4 (96) string entropy
+3.5 (1) sum of strings path c:\
+3.6 (1) sum of strings url (http / https)
+3.7 (1) sum of strings registry HKEY_
+3.8 (1) sum of strings MZ header (droper?)
 
 Section 4.: parsed_features GeneralFileInfo()
 9
+            binary.virtual_size,
+            binary.has_debug,
+            len(binary.exported_functions),
+            len(binary.imported_functions),
+            binary.has_relocations,
+            binary.has_resources,
+            binary.has_signature,
+            binary.has_tls,
+            len(binary.symbols),
+
 Section 5.: parsed_features HeaderFileInfo()
 62
+            [[binary.header.time_date_stamps]],
+            FeatureHasher(10, input_type="string", dtype=self.dtype).transform(
+                [[str(binary.header.machine)]]).toarray(),
+            FeatureHasher(10, input_type="string", dtype=self.dtype).transform(
+                [[str(c) for c in binary.header.characteristics_list]]).toarray(),
+            FeatureHasher(10, input_type="string", dtype=self.dtype).transform(
+                [[str(binary.optional_header.subsystem)]]).toarray(),
+            FeatureHasher(10, input_type="string", dtype=self.dtype).transform(
+                [[str(c) for c in binary.optional_header.dll_characteristics_lists]]).toarray(),
+            FeatureHasher(10, input_type="string", dtype=self.dtype).transform(
+                [[str(binary.optional_header.magic)]]).toarray(),
+            [[binary.optional_header.major_image_version]],
+            [[binary.optional_header.minor_image_version]],
+            [[binary.optional_header.major_linker_version]],
+            [[binary.optional_header.minor_linker_version]],
+            [[binary.optional_header.major_operating_system_version]],
+            [[binary.optional_header.minor_operating_system_version]],
+            [[binary.optional_header.major_subsystem_version]],
+            [[binary.optional_header.minor_subsystem_version]],
+            [[binary.optional_header.sizeof_code]],
+            [[binary.optional_header.sizeof_headers]],
+            [[binary.optional_header.sizeof_heap_commit]],
+
 Section 6.: parsed_features SectionInfo()
 5 + 50 + 50 + 50 + 50 + 50 = 255
+            np.atleast_2d(np.asarray(general, dtype=self.dtype)),
+            FeatureHasher(50, input_type="pair", dtype=self.dtype).transform(
+                [section_sizes]).toarray(),
+            FeatureHasher(50, input_type="pair", dtype=self.dtype).transform(
+                [section_entropy]).toarray(),
+            FeatureHasher(50, input_type="pair", dtype=self.dtype).transform(
+                [section_vsize]).toarray(),
+            FeatureHasher(50, input_type="string", dtype=self.dtype).transform(
+                [entry_name]).toarray(),
+            FeatureHasher(50, input_type="string", dtype=self.dtype).transform([entry_characteristics]).toarray()
+
 Section 7.: parsed_features ImportsInfo()
 256 + 1024 = 1280
+            FeatureHasher(256, input_type="string", dtype=self.dtype).transform(
+                [libraries]).toarray(),
+            FeatureHasher(1024, input_type="string", dtype=self.dtype).transform(
+                [imports]).toarray()
 Section 8.: parsed_features ExportsInfo()
 128
+        return FeatureHasher(128, input_type="string", dtype=self.dtype).transform([binary.exported_functions]).toarray().flatten().astype(self.dtype)
 '''
 import lief
 import numpy as np
@@ -198,7 +259,8 @@ class ImportsInfo(FeatureType):
         libraries = [l.lower() for l in binary.libraries]
         # we'll create a string like "kernel32.dll:CreateFileMappingA" for each entry
         imports = [lib.name.lower() + ':' +
-                   e.name for lib in binary.imports for e in lib.entries]
+                   e.name.lower() for lib in binary.imports for e in lib.entries]
+
 
         # two separate elements: libraries (alone) and fully-qualified names of imported functions
         return np.concatenate([

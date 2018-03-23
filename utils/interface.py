@@ -4,14 +4,11 @@ import hashlib
 class FileRetrievalFailure(Exception):
     pass
 
-def fetch_file_withsha256_chunked(file_path):
+def fetch_file_withsha256(file_path):
     sha256 = hashlib.sha256()
     try:
         with open(file_path, 'rb') as infile:
-            while True:
-                data = infile.read(65536)
-                if not data:
-                    break
+            data = infile.read()
             sha256.update(data)
     except IOError:
         print(IOError.strerror)

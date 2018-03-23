@@ -3,3 +3,4 @@ sklearn==0.0
 numpy==1.13.1
 https://github.com/lief-project/packages/raw/lief-master-latest/pylief-0.8.3.dev.zip
 scipy
+python-magic

@@ -99,6 +99,9 @@ import numpy as np
 from sklearn.feature_extraction import FeatureHasher
 import re
 
+class NoPEFileException(Exception):
+    pass
+
 class FeatureType(object):
     '''Base class from which each feature type may inherit'''
 
@@ -424,7 +427,7 @@ class PEFeatureExtractor(object):
             binary = lief.parse(list(bytez))
         except (lief.bad_format, lief.bad_file, lief.pe_error, lief.parser_error,RuntimeError):
             # some kind of parsing problem, none of these feature extractors will work
-            print("error while parsing with lief")
+            raise NoPEFileException()
             binary = None
             featurevectors.extend([fe.empty() for fe in self.parsed_features])
         # except: # everything else (KeyboardInterrupt, SystemExit, ValueError):

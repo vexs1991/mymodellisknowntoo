@@ -2,6 +2,7 @@ import sys
 from utils.interface import file_classificiation, get_exe_files_in_folder, fetch_file_with_hash, FileRetrievalFailure
 from utils.pefeatures import PEFeatureExtractor, NoPEFileException
 
+'use get_files_in_folder if your pe-files files are sorted already'
 for file_path in get_exe_files_in_folder("/home/manuel/Downloads"):
     try:
         'read file, generate hash'

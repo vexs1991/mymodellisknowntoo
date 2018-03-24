@@ -41,6 +41,7 @@ class file_handler():
             return True
         return False
 
+'''binary object'''
 class binary():
     class type(enumerate):
         BENIGN = 0
@@ -76,9 +77,8 @@ class binary():
         except (Exception):
             raise
 
-
+'''file_extraction works with binary objects'''
 class file_extraction():
-    '''file_extraction interacts closely with pefeatures'''
     def __init__(self, folder_engine=file_handler.get_files_in_folder, file_handle_error=sys.stderr):
         '''folder_engine
         get_exe_files_in_folder* preselects windows executables by guessing the file type (performance hit)
@@ -87,14 +87,6 @@ class file_extraction():
         self.folder_engine = folder_engine
         self.file_handle_error = file_handle_error
 
-    '''worker thread for file extraction'''
-    def extract_single_file_worker(self, file_queue, out):
-        while not file_queue.empty():
-            element = file_queue.get()
-            self.extract_single_file(element, out)
-            file_queue.task_done()
-        exit(0)
-
     '''use for single file extraction, takes output_action as argument'''
     def extract_single_file(self, file_path, out):
         try:
@@ -102,6 +94,14 @@ class file_extraction():
             out(processed_binary.process(file_path))
         except (NoPEFileException, file_handler.FileRetrievalFailure):
             print('Error while processing file: {}; {}'.format(file_path, str(Exception)), file=self.file_handle_error)
+
+    '''worker thread for file extraction'''
+    def extract_single_file_worker(self, file_queue, out):
+        while not file_queue.empty():
+            element = file_queue.get()
+            self.extract_single_file(element, out)
+            file_queue.task_done()
+        exit(0)
 
     '''use for folder file extraction, takes output_action as argument'''
     def extract_folder(self, folder_path, out):
@@ -123,13 +123,14 @@ class file_extraction():
 
         q.join()
 
+'''Various action functions that take a binary object as parameter'''
 class file_action():
-    '''Various action functions'''
     def __init__(self, file_classification=binary.type.UKNOWN, file_handle_info=sys.stdout, file_handle_error=sys.stdout):
         self.file_classificiation = file_classification
         self.file_handle_info = file_handle_info
         self.file_handle_error = file_handle_error
 
+    '''Outputs debug binary information to file_handle_info (default: stdout)'''
     def print_debug(self, processed_binary):
         print("file name = {}, file md5 = {}, features size: {}, feature_format: {}\n".format(processed_binary.file_path, processed_binary.md5sum, processed_binary.features.size, type(processed_binary.features[0])), file=self.file_handle_info)
 
@@ -143,7 +144,7 @@ class file_action():
             print("{}".format(processed_binary.features.tolist()[section_start:section_end]), file=self.file_handle_info)
             section_start = section_end
 
-    '''Outputs binary information in format specified to sdtout'''
+    '''Outputs binary information in format specified by project group to file_handle_info (default: stdout)'''
     def print_csv(self, processed_binary):
         print("{};{};{}".format(processed_binary.md5sum, self.file_classificiation,
                                 ';'.join(str(x) for x in processed_binary.features)), file=self.file_handle_info)

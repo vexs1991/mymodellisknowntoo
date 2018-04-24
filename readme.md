@@ -22,4 +22,17 @@ $ find /media/dataspacedisk/pe32files -type f | wc -l <br/>
   - folder
   - file
   - classification
-  - debug
+  - debug#count files in dir
+find ./infected/ ./clean/ -type f | wc -l
+
+# BENIGN count
+grep -e "^[0-9a-f]\{32\};0;[.]*" ikarus_20180424.csv | wc -l
+# MALWARE count
+grep -e "^[0-9a-f]\{32\};1;[.]*" ikarus_20180424.csv | wc -l
+
+# invalid entries
+grep -v -e "[0-9a-f]\{32\};[.]*" ikarus_20180424.csv
+
+# syntaxcheck
+grep -e "^[0-9a-f]\{32\};0;[0-9.;]*$" ikarus_20180424.csv | wc -l
+2350 float werte

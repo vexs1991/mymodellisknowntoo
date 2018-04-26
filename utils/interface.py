@@ -2,6 +2,7 @@ import os
 import sys
 import hashlib
 import magic
+from enum import Enum
 from numpy import ndarray
 from utils.pefeatures import PEFeatureExtractor, NoPEFileException
 from queue import Queue
@@ -43,7 +44,7 @@ class file_handler():
 
 '''binary object'''
 class binary():
-    class type(enumerate):
+    class type(Enum):
         BENIGN = 0
         MALWARE = 1
         UKNOWN = 2
@@ -86,14 +87,15 @@ class file_extraction():
         '''
         self.folder_engine = folder_engine
         self.file_handle_error = file_handle_error
+        self.file_count = 0
 
     '''use for single file extraction, takes output_action as argument'''
     def extract_single_file(self, file_path, out):
         try:
             processed_binary = binary()
             out(processed_binary.process(file_path))
-        except (NoPEFileException, file_handler.FileRetrievalFailure):
-            print('Error while processing file: {}; {}'.format(file_path, str(Exception)), file=self.file_handle_error)
+        except (NoPEFileException, file_handler.FileRetrievalFailure) as e:
+            print('Error while processing file: {}. {}'.format(file_path, str(e)), file=self.file_handle_error)
 
     '''worker thread for file extraction'''
     def extract_single_file_worker(self, file_queue, out):
@@ -116,6 +118,8 @@ class file_extraction():
         for file_path in self.folder_engine(folder_path):
             q.put(file_path)
 
+        self.file_count = q.qsize()
+
         for i in range(threads):
             worker = Thread(target=self.extract_single_file_worker, args=(q, out,))
             worker.setDaemon(True)
@@ -129,6 +133,7 @@ class file_action():
         self.file_classificiation = file_classification
         self.file_handle_info = file_handle_info
         self.file_handle_error = file_handle_error
+        self.print_count = 0
 
     '''Outputs debug binary information to file_handle_info (default: stdout)'''
     def print_debug(self, processed_binary):
@@ -144,8 +149,11 @@ class file_action():
             print("{}".format(processed_binary.features.tolist()[section_start:section_end]), file=self.file_handle_info)
             section_start = section_end
 
+        self.print_count += 1
+
     '''Outputs binary information in format specified by project group to file_handle_info (default: stdout)'''
     def print_csv(self, processed_binary):
         print("{};{};{}".format(processed_binary.md5sum, self.file_classificiation,
                                 ';'.join(str(x) for x in processed_binary.features)), file=self.file_handle_info)
 
+        self.print_count += 1

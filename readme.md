@@ -30,12 +30,3 @@ grep -v -e "[0-9a-f]\{32\};[.]*" XYZ_20180424.csv ##todo
 
 ## syntaxcheck - 2350 floats
 grep -e "^[0-9a-f]\{32\};0;[0-9.;]*$" ikarus_20180424.csv | wc -l ##todo
-
-# todo
-- command line interface
-  - preselection
-  - folder
-  - file
-  - classification
-  - debug#count files in dir
-

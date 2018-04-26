@@ -12,13 +12,13 @@ if [ $# -eq 0 ]; then
     exit 0
 fi
 
-#for folder (not recursive)
+#folder path (not recursive)
 #FOLDER_PATH="/"
 FOLDER_PATH="$1"
 
 [[ -d "$FOLDER_PATH" ]] || exit 1
 
-#every file in folder do
+#for every file in folder do
 for filename in $FOLDER_PATH/*; do
    #clean file type and remove unwanted chars
    CLEAN_FILE_TYPE=$(/usr/bin/file -b "$filename" | sed -r 's/[/,.;:]+//g' | sed -r 's/[ ]+/_/g')

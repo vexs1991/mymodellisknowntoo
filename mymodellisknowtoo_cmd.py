@@ -1,7 +1,9 @@
-from utils.interface import file_extraction, binary, file_handler, file_action
+#!/usr/bin/python
 import os
 import sys
 import argparse
+
+from utils.interface import file_extraction, binary, file_handler, file_action
 
 # get list of implemented binary types
 types = [item.name for item in binary.type]
@@ -9,7 +11,7 @@ types = [item.name for item in binary.type]
 parser = argparse.ArgumentParser()
 parser.add_argument("type", help="type of binary to be found in folder {}".format(types))
 parser.add_argument("folder", help="folder or file to scan")
-parser.add_argument("-t", "--threats", type=int, help="number of threads to use")
+parser.add_argument("-t", "--threads", type=int, help="number of threads to use")
 parser.add_argument("-c", "--csv", action="store_true", help="outputs in csv format")
 parser.add_argument("-o", "--output", help="csv output, if not defined we print to stdout")
 args = parser.parse_args()
@@ -25,8 +27,8 @@ if not args.type in types:
 fe = file_extraction(folder_engine=file_handler.get_files_in_folder)
 fa = file_action(file_classification=binary.type[args.type])
 
-if args.threats is None:
-   threats = 4
+if args.threads is None:
+   threads = 4
 
 if args.output is not None:
    # open and print to output log
@@ -39,10 +41,10 @@ print("Starting to analyze {}, classified as {}".format(args.folder, args.type))
 if os.path.isdir(args.folder):
    # print as csv
    if args.csv:
-      fe.extract_folder_threaded(args.folder, fa.print_csv, threats)
+      fe.extract_folder_threaded(args.folder, fa.print_csv, threads)
    # or some nice debug information
    else:
-      fe.extract_folder_threaded(args.folder, fa.print_debug, threats)
+      fe.extract_folder_threaded(args.folder, fa.print_debug, threads)
    # print stats
    print("Files in folder: {}, Files processed: {}, Errors: {}".format(fe.file_count, fa.print_count, fe.file_count - fa.print_count))
 elif os.path.isfile(args.folder):

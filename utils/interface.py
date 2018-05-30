@@ -153,7 +153,7 @@ class file_action():
 
     '''Outputs binary information in format specified by project group to file_handle_info (default: stdout)'''
     def print_csv(self, processed_binary):
-        print("{};{};{}".format(processed_binary.md5sum, self.file_classificiation,
+        print("{};{};{}".format(processed_binary.md5sum, self.file_classificiation.value,
                                 ';'.join(str(x) for x in processed_binary.features)), file=self.file_handle_info)
 
         self.print_count += 1

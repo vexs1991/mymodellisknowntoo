@@ -29,4 +29,5 @@ grep -e "^[0-9a-f]\{32\};1;[.]*" XYZ_20180424.csv | wc -l
 grep -v -e "[0-9a-f]\{32\};[.]*" XYZ_20180424.csv ##todo
 
 ## syntaxcheck - 2350 floats
-grep -e "^[0-9a-f]\{32\};0;[0-9.;]*$" ikarus_20180424.csv | wc -l ##todo
+deadslow needs optimization <br/>
+egrep -e "^[0-9a-f]{32};1;([0-9.-]*;){2349}[0-9.-]*" /media/dataspacedisk/statcsv/combined/50-50_2.csv  | wc -l

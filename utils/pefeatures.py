@@ -11,6 +11,7 @@ check out the following resources:
 It may be useful to do feature selection to reduce this set of features to a meaningful set
 for your modeling problem.
 
+shouts out to endgame inc! https://github.com/endgameinc/youarespecial/blob/master/classifier/pefeatures.py
 
 numpy.ndarray, size 2350, numpy.float64
 
